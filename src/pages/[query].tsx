@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { api } from "../utils/api";
 import Spinner from "../components/Spinner";
+import SearchResults from "../components/SearchResults";
 
 const Crawler = () => {
   //Get the query param from the URL
@@ -17,8 +19,6 @@ const Crawler = () => {
       refetchOnWindowFocus: false,
     }
   );
-
-  !!data && console.log(data.html?.a[10]);
 
   if (isLoading) {
     return (
@@ -41,22 +41,20 @@ const Crawler = () => {
           referrerPolicy="no-referrer"
         />
       </Head>
-      <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-orange-800 to-red-800">
-        <button
-          onClick={() => router.push("/")}
-          className="absolute left-8 top-6 flex items-center text-slate-200 outline-none transition-colors hover:text-white"
-        >
-          <i className="fa-solid fa-angles-left text-xl" />
-        </button>
+      <main className="flex min-h-screen flex-col items-center justify-start bg-gradient-to-b from-orange-800 to-red-800">
+        <header className="sticky bottom-full w-full items-center justify-start py-6 px-8">
+          <button
+            onClick={() => router.push("/")}
+            className="flex items-center text-slate-200 outline-none transition-colors hover:text-white"
+          >
+            <i className="fa-solid fa-angles-left text-xl" />
+          </button>
+        </header>
         {!!data && data.error !== null && (
           <h1 className="text-xl text-slate-200">{data.error}</h1>
         )}
         {!!data && data.html !== null && (
-          <div>
-            {data.html.a.map((anchor) => {
-              return <p className="text-slate-200">{anchor}</p>;
-            })}
-          </div>
+          <SearchResults query={data.html.title} data={data.html.a} />
         )}
       </main>
     </>

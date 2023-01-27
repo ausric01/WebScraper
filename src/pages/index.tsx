@@ -29,8 +29,8 @@ const Home: NextPage = () => {
         />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-orange-800 to-red-800">
-        <h1 className="select-none text-5xl font-extrabold tracking-tight text-slate-200">
-          <span className="italic text-amber-400">Web</span> Scraper
+        <h1 className="select-none text-5xl font-thin tracking-tight text-slate-200">
+          <span className="text-amber-400">Web</span> Scraper
         </h1>
         <URLForm submit={onSubmit} />
       </main>

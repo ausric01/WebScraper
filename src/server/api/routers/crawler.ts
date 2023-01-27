@@ -9,7 +9,7 @@ export const crawlerRouter = createTRPCRouter({
     .input(z.object({ query: z.string() }))
     .query(async ({ input }) => {
       try {
-        let query = decode(input.query);
+        const query = decode(input.query);
         const html = await scrape(query);
         //
         return {

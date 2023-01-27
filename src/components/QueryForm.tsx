@@ -15,9 +15,9 @@ const QueryForm: FC<{
         onChange={(e) => alterQuery(e.target.value)}
         type="text"
         placeholder="Search"
-        className="w-96 rounded-l-full border-2 border-r-0 border-slate-200 py-1 px-4 text-slate-800 outline-none transition-colors placeholder:italic placeholder:tracking-wide placeholder:opacity-75"
+        className="w-72 rounded-l-full border-2 border-r-0 border-slate-200/50 py-1 px-4 text-slate-800 outline-none transition-colors placeholder:italic placeholder:tracking-wide placeholder:opacity-75 md:w-96"
       />
-      <button className="rounded-r-full border-2 border-l-0 border-slate-200 bg-amber-400 py-1 pl-4 pr-5 font-medium text-white transition-colors hover:text-amber-600">
+      <button className="rounded-r-full border-2 border-l-0 border-slate-200/50 bg-amber-400 py-1  pl-2 pr-3 font-medium text-white transition-colors hover:text-amber-600 md:pl-4 md:pr-5">
         <i className="fa-solid fa-magnifying-glass" />
       </button>
     </form>

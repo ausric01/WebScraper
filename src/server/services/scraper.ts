@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { load } from "cheerio";
 import { z } from "zod";
 
@@ -9,9 +10,13 @@ import { z } from "zod";
  * }} HTML Contents
  */
 export async function scrape(query: string) {
-  const data = await fetch(`https://google.ca/search?q=${query}`);
-  const html = await data.text();
-  const scrape = await _get_(html);
+  const googleData = await fetch(`https://google.ca/search?q=${query}`);
+  const bingData = await fetch(`https://www.bing.com/search?q=${query}`);
+
+  const google = await googleData.text();
+  const bing = await bingData.text();
+
+  const scrape = _get_(google + bing, query);
   return scrape;
 }
 
@@ -23,33 +28,47 @@ export async function scrape(query: string) {
  *  a: Array<string>
  * }} HTML contents
  */
-async function _get_(html: string) {
+function _get_(html: string, query: string) {
   const $ = load(html);
-  //
-  const title = $("title").text();
-  let a = Array<string>();
+  const a = new Set<{ title: string; href: string }>();
+
   $("a[href]").map((i, el) => {
-    if ($(el).attr("href")!.startsWith("/url?q=")) {
-      const url = $(el).attr("href")!.substring(7);
+    if ($(el).attr("href")?.startsWith("/url?q=")) {
+      const href = $(el).attr("href")!.substring(7);
+      let title = $(el).text();
 
-      //Check the index of both characters
-      const aI = url.indexOf("&");
-      const pI = url.indexOf("%");
+      //Trim the title
+      if (avoids.includes(title.toLowerCase())) return;
+      title.indexOf("www") !== -1 &&
+        (title = title.substring(0, title.indexOf("www")));
 
-      //Condition checking
-      if (aI < 0 && pI < 0) a.push(url);
-      if (aI < 0 && pI > 0) a.push(url.substring(0, pI));
-      if (aI > 0 && pI < 0) a.push(url.substring(0, aI));
-      if (aI > 0 && pI > 0) {
-        aI > pI ? a.push(url.substring(0, pI)) : a.push(url.substring(0, aI));
+      //Get indexes of & and %
+      const iA = href.indexOf("&");
+      const iP = href.indexOf("%");
+
+      //Some duplicate conditional logic here
+      //
+      //No ampersand or percentage
+      if (iA < 0 && iP < 0) a.add({ title, href });
+      ///Percent exists
+      if (iA < 0 && iP > 0) a.add({ title, href: href.substring(0, iP) });
+      //Ampersand exists
+      if (iA > 0 && iP < 0) a.add({ title, href: href.substring(0, iA) });
+      //Both exist
+      //Which comes first
+      if (iA > 0 && iP > 0) {
+        iA > iP
+          ? a.add({ title, href: href.substring(0, iP) })
+          : a.add({ title, href: href.substring(0, iA) });
       }
     }
   });
 
   return {
-    title: title,
+    title: query,
     a: a,
   };
 }
 
-const avoids: Array<string> = [];
+//
+const avoids: Array<string> = ["learn more", "sign in"];
